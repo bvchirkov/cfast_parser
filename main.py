@@ -28,16 +28,12 @@ def linking():
 
 rooms = linking()[0]
 
-for r in rooms.keys():
-    pass
-    # print(rooms[r])
-
 def pathfinder(rooms):
     # inp = input().split()
     # start_room = rooms[int(inp[0])]
     # end_room = rooms[int(inp[1])]
 
-    start_room = rooms[2]
+    start_room = rooms[4]
     end_room = rooms[5]
 
     where = start_room
@@ -49,8 +45,6 @@ def pathfinder(rooms):
     while where != end_room:
         neighbors = list(where.rooms)
 
-        # print(len(neighbors))
-
         if neighbors[numer].wasthere == False:
             where.wasthere = True
             path.append(where)
@@ -59,12 +53,11 @@ def pathfinder(rooms):
         elif numer < len(neighbors) - 1:
             numer += 1
         else:
-            where = path[len(path) - 1]
+            path.append(where)
+            where.wasthere = True
+            where = path[len(path) - 2]
             numer = 0
         
         print(where)
-
-        #debug
-        # where = end_room
 
 pathfinder(rooms)
