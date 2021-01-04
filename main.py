@@ -1,8 +1,12 @@
 from geom import Door, Room
 
+class Building:
+    rooms = dict()
+    doors = dict()
+
 '''Связывание помещений'''
-def linking():
-    f = open("t3.in", "r")
+def linking(aFile_name, aBuilding):
+    f = open(aFile_name, "r")
     rooms = dict()
     doors = dict()
     for line in f:
@@ -23,9 +27,12 @@ def linking():
             room1.add_door(d.did)
             room2.add_door(d.did)
     f.close()
-    return rooms, doors
+    aBuilding.rooms = rooms
+    aBuilding.doors = doors
+    # return rooms, doors
 
-rooms = linking()[0]
+linking("t3.in", Building)
+rooms = Building.rooms
 
 def pathfinder(rooms):
     # inp = input().split()
@@ -60,8 +67,6 @@ def pathfinder(rooms):
         print(where)
 
 pathfinder(rooms)
-obj = linking()
-rooms = obj[0]
 
 for r in rooms.keys():
     print(rooms[r])
