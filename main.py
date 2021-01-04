@@ -12,8 +12,8 @@ def linking(aFile_name, aBuilding):
     for line in f:
         line_items = line.split(',')
         if line.startswith('COMPA'):
-            rid = int(line_items[1].split(' ')[1])
-            rooms[rid] = Room(rid, float(line_items[2]), 
+            roomid = int(line_items[1].split(' ')[1])
+            rooms[roomid] = Room(roomid, float(line_items[2]), 
                                 float(line_items[3]), float(line_items[4]))
         elif line.startswith('HVENT'):
             d = Door(int(line_items[1]), int(line_items[2]))
@@ -66,7 +66,31 @@ def pathfinder(rooms):
         
         print(where)
 
-pathfinder(rooms)
+# pathfinder(rooms)
 
-for r in rooms.keys():
-    print(rooms[r])
+start_point = rooms[2]
+end_point = rooms[9]
+processed_queue = list()
+path = list()
+current_point = start_point
+
+while True:
+    path.append(current_point.roomid)
+    print(current_point.roomid)
+    if current_point.roomid == end_point.roomid:
+        break
+
+    neighbors = list(current_point.rooms)
+    # if len(neighbors) == 1 and neighbors[0] != end_point.roomid:
+    for neighbor in neighbors:
+        if neighbor.wasthere:
+            continue
+        else:
+            processed_queue.append(neighbor)
+    
+    current_point.wasthere = True
+    current_point = processed_queue.pop()
+
+print(path)
+# for r in rooms.keys():
+#     print(rooms[r])
