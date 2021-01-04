@@ -25,7 +25,6 @@ def linking():
     f.close()
     return rooms, doors
 
-
 rooms = linking()[0]
 
 def pathfinder(rooms):
@@ -61,3 +60,8 @@ def pathfinder(rooms):
         print(where)
 
 pathfinder(rooms)
+obj = linking()
+rooms = obj[0]
+
+for r in rooms.keys():
+    print(rooms[r])
