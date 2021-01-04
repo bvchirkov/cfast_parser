@@ -2,7 +2,7 @@ from geom import Door, Room
 
 '''Связывание помещений'''
 def linking():
-    f = open("t.in", "r")
+    f = open("t3.in", "r")
     rooms = dict()
     doors = dict()
     for line in f:
