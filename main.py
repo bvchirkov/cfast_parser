@@ -12,8 +12,8 @@ def linking(aFile_name, aBuilding):
     for line in f:
         line_items = line.split(',')
         if line.startswith('COMPA'):
-            roomid = int(line_items[1].split(' ')[1])
-            rooms[roomid] = Room(roomid, float(line_items[2]), 
+            room_id = int(line_items[1].split(' ')[1])
+            rooms[room_id] = Room(room_id, float(line_items[2]), 
                                 float(line_items[3]), float(line_items[4]))
         elif line.startswith('HVENT'):
             d = Door(int(line_items[1]), int(line_items[2]))
@@ -22,8 +22,8 @@ def linking(aFile_name, aBuilding):
             room1 = rooms[d.room1] # Берем объект из словаря rooms
             room2 = rooms[d.room2]
             
-            room1.add_room(room2)
-            room2.add_room(room1)
+            room1.add_neighbor(room2)
+            room2.add_neighbor(room1)
             room1.add_door(d.did)
             room2.add_door(d.did)
     f.close()
@@ -68,29 +68,51 @@ def pathfinder(rooms):
 
 # pathfinder(rooms)
 
-start_point = rooms[2]
-end_point = rooms[9]
-processed_queue = list()
-path = list()
-current_point = start_point
+current_point = rooms[2]    # Текущая (стартовая) точка
+end_point = rooms[9]        # Конечная точка
+processed_queue = list()    # Очеред на обработку
+step_in_graph = 0           # Шаг обработки
 
+'''Обход графа от стартовой до конечной точки'''
 while True:
-    path.append(current_point.roomid)
-    print(current_point.roomid)
-    if current_point.roomid == end_point.roomid:
+    # Останов если дошли до конечной точки
+    if current_point.room_id == end_point.room_id:
+        # Для конечной точки тоже отмечаем, что там побывали и на каком шаге
+        end_point.wasthere = True              
+        end_point.step_in_graph = step_in_graph
         break
 
-    neighbors = list(current_point.rooms)
-    # if len(neighbors) == 1 and neighbors[0] != end_point.roomid:
-    for neighbor in neighbors:
+    # Обход всех соседей
+    for neighbor in current_point.neighbors:
         if neighbor.wasthere:
             continue
         else:
+            # В очередь попадают только те, в которых не были
             processed_queue.append(neighbor)
+
+    current_point.wasthere = True               # Отмечаем, что побывали в узле
+    current_point.step_in_graph = step_in_graph # Устанавливаем для текущего узла шаг, на котором он был обработан
+    step_in_graph += 1                          # Увеличиваем шаг
     
-    current_point.wasthere = True
-    current_point = processed_queue.pop()
+    current_point = processed_queue.pop()       # Достаем узел из очереди на обработку
+
+'''Восстановление пути от конечной точки'''
+path = list()                       # Путь от начальной до конечной точки
+path.append(current_point.room_id)  # Добавляем первый элемент пути - конечную точку
+
+while True:
+    # Обходим всех соседей точки, на которой остановились в предыдущем цикле
+    for neighbor in current_point.neighbors:
+        if neighbor.step_in_graph == -1: # Если не были в узле, то пропускаем этого соседа
+            continue
+        # Иначе сравниваем шаг, на котором закончили его обрабатывать, с шагом, на котором остановились в цикле выше
+        if neighbor.step_in_graph < current_point.step_in_graph:  # Берем соседа с меньшим шагом
+            current_point = neighbor                # Устанавливаем новый текущий узел
+            path.append(current_point.room_id)      # Добавляем узел в путь
+            break
+    
+    # Если дошли до первого шага по графу, то останавливаем восстановление пути
+    if current_point.step_in_graph == 0:
+        break
 
 print(path)
-# for r in rooms.keys():
-#     print(rooms[r])

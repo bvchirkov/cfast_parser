@@ -1,13 +1,13 @@
 class Room:
     wasthere = False
-
-    def __init__(self, roomid, width, depth, height):
-        self.roomid = roomid
+    step_in_graph = -1 # Номер шага, на котором было обработано помещение
+    def __init__(self, room_id, width, depth, height):
+        self.room_id = room_id
         self.width = width
         self.height = height
         self.depth = depth
         self.doors = set()
-        self.rooms = set()
+        self.neighbors = set()
     
     def area(self):
         return self.width * self.depth
@@ -15,12 +15,12 @@ class Room:
     def add_door(self, did):
         self.doors.add(did)
     
-    def add_room(self, room):
-        self.rooms.add(room)
+    def add_neighbor(self, neighbor):
+        self.neighbors.add(neighbor)
 
     def __str__(self):
-        # return f'Room is {self.roomid}: w:{self.width}, d:{self.depth}, h:{self.height}, doors:{self.doors}, neighbors: {self.rooms}'
-        return f'Room num {self.roomid}'
+        # return f'Room is {self.room_id}: w:{self.width}, d:{self.depth}, h:{self.height}, doors:{self.doors}, neighbors: {self.neighbors}'
+        return f'Room num {self.room_id}'
 
 class Door:
     _did = 0
