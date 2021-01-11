@@ -1,3 +1,5 @@
+from math import sqrt
+
 class Room:
     wasthere = False
     step_in_graph = -1 # Номер шага, на котором было обработано помещение
@@ -8,9 +10,10 @@ class Room:
         self.depth = depth
         self.doors = set()
         self.neighbors = set()
+        self.weight = 0
     
-    def area(self):
-        return self.width * self.depth
+    def calc_weight(self, weight):
+        self.weight = round(sqrt(self.width * self.depth) + weight, 3)
 
     def add_door(self, did):
         self.doors.add(did)

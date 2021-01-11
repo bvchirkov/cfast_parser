@@ -1,5 +1,8 @@
 from geom import Door, Room
 
+MAX_WEIGHT = 13
+EPSELON = 0.3
+
 class Building:
     rooms = dict()
     doors = dict()
@@ -69,12 +72,14 @@ def pathfinder(rooms):
 # pathfinder(rooms)
 
 current_point = rooms[2]    # Текущая (стартовая) точка
+current_point.calc_weight(0)
 end_point = rooms[9]        # Конечная точка
 processed_queue = list()    # Очеред на обработку
 step_in_graph = 0           # Шаг обработки
 
 '''Обход графа от стартовой до конечной точки'''
 while True:
+    print(current_point.room_id, current_point.weight)
     # Останов если дошли до конечной точки
     if current_point.room_id == end_point.room_id:
         # Для конечной точки тоже отмечаем, что там побывали и на каком шаге
@@ -84,35 +89,37 @@ while True:
 
     # Обход всех соседей
     for neighbor in current_point.neighbors:
-        if neighbor.wasthere:
-            continue
+        if neighbor.wasthere: continue
         else:
             # В очередь попадают только те, в которых не были
-            processed_queue.append(neighbor)
+            neighbor.calc_weight(current_point.weight)
+            if neighbor.weight <= MAX_WEIGHT + EPSELON:
+                processed_queue.append(neighbor)
 
     current_point.wasthere = True               # Отмечаем, что побывали в узле
     current_point.step_in_graph = step_in_graph # Устанавливаем для текущего узла шаг, на котором он был обработан
     step_in_graph += 1                          # Увеличиваем шаг
     
+    if len(processed_queue) == 0: break
     current_point = processed_queue.pop()       # Достаем узел из очереди на обработку
 
-'''Восстановление пути от конечной точки'''
+'''Восстановление пути от конечной точки'''                                                                            
 path = list()                       # Путь от начальной до конечной точки
 path.append(current_point.room_id)  # Добавляем первый элемент пути - конечную точку
 
 while True:
     # Обходим всех соседей точки, на которой остановились в предыдущем цикле
     for neighbor in current_point.neighbors:
-        if neighbor.step_in_graph == -1: # Если не были в узле, то пропускаем этого соседа
-            continue
         # Иначе сравниваем шаг, на котором закончили его обрабатывать, с шагом, на котором остановились в цикле выше
-        if neighbor.step_in_graph < current_point.step_in_graph:  # Берем соседа с меньшим шагом
+        if -1 != neighbor.step_in_graph < current_point.step_in_graph:  # Берем соседа с меньшим шагом
             current_point = neighbor                # Устанавливаем новый текущий узел
             path.append(current_point.room_id)      # Добавляем узел в путь
             break
     
     # Если дошли до первого шага по графу, то останавливаем восстановление пути
-    if current_point.step_in_graph == 0:
-        break
+    if current_point.step_in_graph == 0: break
 
 print(path)
+
+for index in path:
+    print(rooms[index].weight)
